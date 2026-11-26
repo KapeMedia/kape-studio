@@ -9,3 +9,5 @@ export const TemplatePreviewLazy = dynamic(() => import("./template-preview").th
   ssr: false,
   loading: Loading,
 });
+
+export const PreviewBakerLazy = dynamic(() => import("./preview-baker").then((m) => m.PreviewBaker), { ssr: false });

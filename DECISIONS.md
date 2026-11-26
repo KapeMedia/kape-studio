@@ -18,3 +18,12 @@ Decizii luate autonom acolo unde SPEC.md nu spune explicit. Format: dată, deciz
 - **Storage:** driverele `local` și `supabase` (REST, fără SDK). `vercel-blob` cade pe `local` cu warning (nu e în v1). Fișierele se servesc mereu prin `/api/files/...` (același origin → canvas-ul nu e „tainted”), inclusiv cu Supabase (bucket privat).
 - **Componente UI scrise de mână** (stil shadcn, peste Radix) într-un singur fișier `src/components/ui/index.tsx` + `toast.tsx`. Fără CLI shadcn.
 - **Fonturi UI:** `@fontsource/inter` (fără `next/font/google`).
+
+- **Provideri LLM cu metode pe sarcină** (`proposeAngles`, `writeCopy`, `interpretFeedback`, `reviewImage`) în loc de un singur `generateJson`: mock-ul determinist e mult mai simplu așa.
+- **Claude: output structurat** (`output_config.format` + Zod, validat din nou și un retry la JSON invalid) în loc de tool use forțat: modelele Claude actuale (Sonnet 5.5) nu mai acceptă `tool_choice` forțat. Am activat și fallback-ul server-side la refuz (`server-side-fallback-2026-07-01`, `fallbacks: "default"`); se scoate din `src/server/providers/llm/anthropic.ts` dacă nu e dorit. Model din `ANTHROPIC_MODEL` (default `claude-sonnet-5-5`, cum cere SPEC).
+- **Retry propriu** (`src/server/providers/retry.ts`) cu backoff la 408/409/429/5xx; retry-urile SDK-urilor sunt dezactivate ca să nu se dubleze.
+- **„Alege tu” la stil** = alegere deterministă după brief + industrie (`chooseStyle`): procente/reducere → Ofertă clară; eveniment → Anunț; food → Produs pe fundal colorat; beauty → Minimal premium; altfel Foto full. *Schimbare:* se poate muta în apelul Claude mai târziu.
+- **Format master** = feed_4x5 dacă e bifat, altfel primul format bifat. O singură imagine de fundal per variantă (generată pe aspectul formatului master), folosită cu `cover` pe toate formatele.
+- **Fundal în background:** `after()` din Next în route handler cu `maxDuration = 300`. Pe Vercel, o generare trebuie să termine în limita `maxDuration` a planului (Hobby: 60 s, Pro: până la 300+ s). Dacă nu ajunge, soluția e o coadă (ex. Inngest/QStash) - notat pentru mai târziu.
+- **Preview-ul** se randează în browser (Konva, fonturi reale) de un component ascuns care procesează variantele fără preview și urcă PNG-ul + lista de texte care nu încap; QA-ul rulează la upload.
+- **QA vision** folosește Claude dacă e configurat, altfel mock-ul (care semnalează doar cuvinte before/after în nișa beauty).

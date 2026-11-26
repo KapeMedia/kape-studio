@@ -9,8 +9,8 @@ _Ultima actualizare: 2026-11-26_
 | M0: Fundația | ✅ gata |
 | M1: Clienți, brand kit, proiecte | ✅ gata |
 | M2: Bibliotecă | ✅ gata |
-| M3: Generare cap-coadă (mock) | ⏳ urmează |
-| M4: Editor + export | — |
+| M3: Generare cap-coadă (mock) | ✅ gata |
+| M4: Editor + export | ⏳ urmează |
 | M5: Feedback + brain | — |
 | M6: Provideri reali + costuri | — |
 | M7: QA + finisare | — |
@@ -38,6 +38,15 @@ _Ultima actualizare: 2026-11-26_
 - Funcții pure testate: `fitText` (încadrare text), `getLayout` (derivare 1:1 / story / landscape / cover), `resolveDocument`.
 - Renderer Konva (`src/editor/document-canvas.tsx`) cu fonturi încărcate prin FontFace, refit cu fontul real, overlay safe zone, suport de editare (selecție, drag, resize).
 
+### M3
+- Interfețe `LLMProvider` / `ImageProvider` + provideri mock (deterministe) + provideri reali (Anthropic, OpenAI, Gemini), selectați automat după chei.
+- Brief complet (mesaj, CTA, note, formate, stil sau „Alege tu”, nr. variante, referințe din brand kit/proiect, provider imagine), „Propune unghiuri” cu editare inline.
+- `buildContext` (ordinea din SPEC 10.3, scope pe format/stil, uses/lastUsedAt/event `used`), snapshot salvat pe generare și panoul „De ce a făcut asta?”.
+- Pipeline în fundal (`after()`): 1 apel copy → imagini în paralel (max 4) → compoziție pe toate formatele bifate; eșecul unei variante nu le oprește pe celelalte.
+- Preview PNG randat în browser cu Konva și urcat pe server; QA determinist rulează la upload.
+- Grid de review cu polling: Aprobă / Respinge (cu motiv) / Regenerează imaginea / Duplică / Deschide în editor; aprobat/respins → referințe folosite ca exemple în context.
+- `llm_calls` populat pentru fiecare apel (cost 0 pe mock).
+
 ## Cum pornești
 
 ```
@@ -47,7 +56,7 @@ pnpm dev
 Apoi deschizi http://localhost:3000. Nu trebuie niciun `.env`.
 
 ## Ce urmează
-- M3: generare cap-coadă cu provideri mock (brief, unghiuri, buildContext, copy + vizual, imagini, compoziție, grid de review, „De ce a făcut asta?”).
+- M4: editor (Konva + panou proprietăți, undo/redo, formate) și export ZIP.
 
 ## Blocat
 - Nimic.
