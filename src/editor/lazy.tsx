@@ -11,3 +11,8 @@ export const TemplatePreviewLazy = dynamic(() => import("./template-preview").th
 });
 
 export const PreviewBakerLazy = dynamic(() => import("./preview-baker").then((m) => m.PreviewBaker), { ssr: false });
+
+export const VariantEditorLazy = dynamic(() => import("./variant-editor").then((m) => m.VariantEditor), {
+  ssr: false,
+  loading: () => <div className="h-[600px] w-full animate-pulse rounded-lg bg-gray-100" />,
+});

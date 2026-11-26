@@ -14,7 +14,7 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("reject"), reason: z.string().optional() }),
   z.object({ action: z.literal("status"), status: z.enum(["draft", "in_review", "approved", "rejected", "delivered"]) }),
   z.object({ action: z.literal("duplicate") }),
-  z.object({ action: z.literal("regenerate_image"), instruction: z.string().optional() }),
+  z.object({ action: z.literal("regenerate_image"), instruction: z.string().optional(), keepDocuments: z.boolean().optional() }),
 ]);
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -49,7 +49,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       }
       case "regenerate_image":
         await db.update(variants).set({ status: "pending", error: null }).where(eq(variants.id, id));
-        after(() => regenerateVariantImage(db, id, { instruction: a.instruction }).catch((e: unknown) => console.error("[regenerate]", e)));
+        after(() => regenerateVariantImage(db, id, { instruction: a.instruction, keepDocuments: a.keepDocuments }).catch((e: unknown) => console.error("[regenerate]", e)));
         break;
     }
     return Response.json({ ok: true });

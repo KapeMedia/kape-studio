@@ -15,9 +15,24 @@ function scaleText<L extends Layer>(l: L, s: number): L {
   return { ...l, maxSize, minSize };
 }
 
-/** feed_1x1 from feed_4x5: same relative boxes (compressed vertically). */
-function deriveSquare(master: Layout): Layout {
-  return { ...master, layers: master.layers.map((l) => ({ ...l, box: { ...l.box } })) };
+/**
+ * feed_1x1 from feed_4x5: same relative boxes (compressed vertically). Text and logo are
+ * re-mapped from the master's padded area into the target's safe zone so they keep the margins.
+ */
+function deriveSquare(master: Layout, target?: FormatSpec, masterSpec: { width: number; height: number } = { width: 1080, height: 1350 }): Layout {
+  if (!target) return { ...master, layers: master.layers.map((l) => ({ ...l, box: { ...l.box } })) };
+  const pad = 64;
+  const mTop = pad / masterSpec.height;
+  const mRange = 1 - 2 * mTop;
+  const sTop = target.safeZone.top / target.height;
+  const sRange = 1 - sTop - target.safeZone.bottom / target.height;
+  const k = sRange / mRange;
+  const layers = master.layers.map((l): Layer => {
+    if (l.type !== "text" && l.type !== "logo") return { ...l, box: { ...l.box } };
+    const y = sTop + (l.box.y - mTop) * k;
+    return scaleText({ ...l, box: roundBox({ x: l.box.x, y: clamp(y, sTop, 1), w: l.box.w, h: l.box.h * k }) } as Layer, Math.max(0.85, k));
+  });
+  return { ...master, layers };
 }
 
 /**
@@ -69,8 +84,12 @@ function deriveWide(master: Layout, target: FormatSpec, masterSpec: { width: num
   const H = target.height;
   const sz = target.safeZone;
   const center = target.key === "fb_cover";
-  const colX = sz.left / W;
-  const colW = center ? (W - sz.left - sz.right) / W : Math.min(0.5, (W - sz.left - sz.right) / W) - 0.02;
+  // keep the column clear of avoidRects (e.g. the profile picture on the FB cover)
+  const avoidRight = Math.max(0, ...(sz.avoidRects ?? []).map((r) => r.x + r.w + 16));
+  const left = Math.max(sz.left, center ? avoidRight : sz.left);
+  const right = center ? Math.max(sz.right, left) : sz.right;
+  const colX = left / W;
+  const colW = center ? (W - left - right) / W : Math.min(0.5, (W - sz.left - sz.right) / W) - 0.02;
   const top = sz.top / H;
   const bottom = 1 - sz.bottom / H;
   const s = clamp(Math.min(W / masterSpec.width, H / masterSpec.height) * 1.3, 0.4, 1);
@@ -140,9 +159,9 @@ export function getLayout(
   if (explicit) return explicit;
   const master = def.layouts.feed_4x5!;
   if (target.key === "feed_4x5") return master;
-  if (target.key === "feed_1x1") return deriveSquare(master);
+  if (target.key === "feed_1x1") return deriveSquare(master, target, masterSpec);
   const ratio = target.width / target.height;
   if (ratio < 0.8) return deriveStory(master, target, masterSpec);
   if (ratio > 1.3) return deriveWide(master, target, masterSpec);
-  return deriveSquare(master);
+  return deriveSquare(master, target, masterSpec);
 }

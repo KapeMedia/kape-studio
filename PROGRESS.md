@@ -10,8 +10,8 @@ _Ultima actualizare: 2026-11-26_
 | M1: Clienți, brand kit, proiecte | ✅ gata |
 | M2: Bibliotecă | ✅ gata |
 | M3: Generare cap-coadă (mock) | ✅ gata |
-| M4: Editor + export | ⏳ urmează |
-| M5: Feedback + brain | — |
+| M4: Editor + export | ✅ gata |
+| M5: Feedback + brain | ⏳ în lucru (cod scris, de verificat) |
 | M6: Provideri reali + costuri | — |
 | M7: QA + finisare | — |
 
@@ -47,6 +47,14 @@ _Ultima actualizare: 2026-11-26_
 - Grid de review cu polling: Aprobă / Respinge (cu motiv) / Regenerează imaginea / Duplică / Deschide în editor; aprobat/respins → referințe folosite ca exemple în context.
 - `llm_calls` populat pentru fiecare apel (cost 0 pe mock).
 
+### M4
+- Pagina variantei: canvas Konva cu selecție, mutare, redimensionare (Transformer), dublu-click pentru editare text, panou de proprietăți (text, font din brand kit, grosime, mărime/încadrare automată, aliniere, majuscule, culori din paletă + hex liber, fundal buton, overlay/formă, variantă logo, imagine: upload / din brand kit / regenerează păstrând editările).
+- Undo/redo (50 de pași, Ctrl+Z / Ctrl+Y), toggle safe zone, lista de layere cu marcaj „nu încape”.
+- Comutare formate: formatele lipsă se derivă și preiau editările de text/culoare, apoi se editează separat.
+- Salvare cu `documentVersion` incrementat + preview nou + QA refăcut.
+- Export: PNG la rezoluție completă pe formatele bifate, ZIP `client_proiect_stil_format_v{index}.png` (verificat: 3 PNG-uri 1080×1350 / 1080×1920 / 1080×1080).
+- Derivarea 1:1 și cover respectă acum safe zone-ul (test pe toate stilurile × toate formatele).
+
 ## Cum pornești
 
 ```
@@ -56,7 +64,7 @@ pnpm dev
 Apoi deschizi http://localhost:3000. Nu trebuie niciun `.env`.
 
 ## Ce urmează
-- M4: editor (Konva + panou proprietăți, undo/redo, formate) și export ZIP.
+- M5: verificare feedback → reguli în browser, teste pentru promovare/arhivare.
 
 ## Blocat
 - Nimic.

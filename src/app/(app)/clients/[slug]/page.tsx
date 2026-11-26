@@ -144,7 +144,7 @@ export default async function ClientPage({
         </div>
       )}
 
-      {tab === "brain" && <BrainTab clientId={client.id} />}
+      {tab === "brain" && <BrainTab clientId={client.id} slug={slug} />}
 
       {tab === "projects" && <ProjectsList slug={slug} projects={projects} />}
 

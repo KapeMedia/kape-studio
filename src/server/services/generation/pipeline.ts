@@ -84,6 +84,13 @@ export function composeDocuments(args: {
   return docs;
 }
 
+/** Swaps the image source of every image layer in every format document. */
+export function replaceBackground(docs: Record<string, VariantDocument>, key: string): Record<string, VariantDocument> {
+  const out: Record<string, VariantDocument> = {};
+  for (const [k, d] of Object.entries(docs)) out[k] = { ...d, layers: d.layers.map((l) => (l.type === "image" ? { ...l, src: key } : l)) };
+  return out;
+}
+
 /** Creates the generation row (queued). The caller runs `runGeneration` in the background. */
 export async function createGeneration(db: DB, args: { clientId: string; projectId: string; userId: string | null; brief: BriefInput }) {
   const brief = normalizeDeep(args.brief);
@@ -113,6 +120,8 @@ export async function produceVariantImage(
     generationId: string;
     useBrandPhotoKey?: string;
     promptSuffix?: string;
+    /** keep the (possibly edited) documents and only swap the background image */
+    keepDocuments?: boolean;
   },
 ): Promise<number> {
   const { variant, brand } = args;
@@ -144,7 +153,10 @@ export async function produceVariantImage(
       backgroundKey = makeKey(`clients/${args.client.id}/generated`, result.mimeType);
       await getStorage().put(backgroundKey, result.image, result.mimeType);
     }
-    const documents = composeDocuments({ bundle: args.bundle, formats: args.formats, copy: variant.copy, brand, backgroundKey });
+    const documents =
+      args.keepDocuments && Object.keys(variant.documents).length
+        ? replaceBackground(variant.documents, backgroundKey)
+        : composeDocuments({ bundle: args.bundle, formats: args.formats, copy: variant.copy, brand, backgroundKey });
     await db
       .update(variants)
       .set({ backgroundAssetKey: backgroundKey, documents, status: variant.status === "pending" || variant.status === "failed" ? "draft" : variant.status, error: null, previewKey: null, qa: null, documentVersion: variant.documentVersion + 1 })
@@ -270,7 +282,7 @@ export async function runGeneration(db: DB, generationId: string, deps: Pipeline
 }
 
 /** Regenerates only the image of one variant (optionally with an extra instruction). */
-export async function regenerateVariantImage(db: DB, variantId: string, opts: { instruction?: string; deps?: PipelineDeps } = {}) {
+export async function regenerateVariantImage(db: DB, variantId: string, opts: { instruction?: string; deps?: PipelineDeps; keepDocuments?: boolean } = {}) {
   const [v] = await db.select().from(variants).where(eq(variants.id, variantId));
   if (!v) throw new Error("Variantă inexistentă");
   const [gen] = await db.select().from(generations).where(eq(generations.id, v.generationId));
@@ -296,6 +308,7 @@ export async function regenerateVariantImage(db: DB, variantId: string, opts: { 
     image,
     referenceKeys: [...sv.referenceAssetKeys.slice(0, 2), ...gen.brief.referenceKeys.slice(0, 2)],
     generationId: gen.id,
+    keepDocuments: opts.keepDocuments,
   });
   await db.update(generations).set({ costUsd: gen.costUsd + cost }).where(eq(generations.id, gen.id));
 }

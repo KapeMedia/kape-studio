@@ -5,6 +5,7 @@ import { resolveDocument } from "@/lib/resolve";
 import { paletteFromColors } from "@/lib/colors";
 import { SEED_FORMATS, SEED_STYLES, DEMO_CLIENTS } from "@/server/db/seed-data";
 import { templateDefinitionSchema } from "@/lib/template-types";
+import { checkSafeZone } from "@/server/services/qa/checks";
 
 const mono: Measurer = (t, size) => t.length * size * 0.5;
 const fmt = (key: string) => SEED_FORMATS.find((f) => f.key === key)!;
@@ -51,9 +52,12 @@ describe("format derivation", () => {
     expect(getLayout(def, fmt("story_9x16"))).toBe(def.layouts.story_9x16);
   });
 
-  it("feed_1x1 keeps the same relative boxes", () => {
+  it("feed_1x1 keeps image/shape boxes and remaps text into the safe zone", () => {
     const l = getLayout(defNoStory, fmt("feed_1x1"));
-    expect(l.layers.map((x) => x.box)).toEqual(def.layouts.feed_4x5!.layers.map((x) => x.box));
+    const master = def.layouts.feed_4x5!.layers;
+    for (const layer of l.layers.filter((x) => x.type === "image" || x.type === "shape")) {
+      expect(layer.box).toEqual(master.find((m) => m.id === layer.id)!.box);
+    }
   });
 
   it("story: text stays in the safe zone, edge layers extend to the canvas edge", () => {
@@ -86,6 +90,21 @@ describe("format derivation", () => {
       const x1 = (t.box.x + t.box.w) * f.width;
       expect(x0).toBeGreaterThanOrEqual(f.safeZone.left - 1);
       expect(x1).toBeLessThanOrEqual(f.width - f.safeZone.right + 1);
+    }
+  });
+});
+
+describe("safe zones across all seed styles and formats", () => {
+  it("text and logo layers stay inside the safe zone (explicit and derived layouts)", () => {
+    const palette = paletteFromColors(DEMO_CLIENTS[0]!.colors);
+    for (const st of SEED_STYLES) {
+      for (const variant of [st.template.definition, { layouts: { feed_4x5: st.template.definition.layouts.feed_4x5! } }]) {
+        for (const f of SEED_FORMATS) {
+          const doc = resolveDocument({ templateId: "t", definition: variant, format: f, copy: { headline: "Titlu", subheadline: "Sub", cta: "CTA", extra: { price: "-40%", badge: "30 NOV" } }, palette, fonts: { heading: "Inter", body: "Inter" }, assets: { background: "b", logo: "l", logoLight: null } });
+          const issues = checkSafeZone(doc, f.safeZone);
+          expect(issues.map((i) => `${st.slug}/${f.key}: ${i.message}`)).toEqual([]);
+        }
+      }
     }
   });
 });

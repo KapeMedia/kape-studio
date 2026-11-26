@@ -27,3 +27,5 @@ Decizii luate autonom acolo unde SPEC.md nu spune explicit. Format: dată, deciz
 - **Fundal în background:** `after()` din Next în route handler cu `maxDuration = 300`. Pe Vercel, o generare trebuie să termine în limita `maxDuration` a planului (Hobby: 60 s, Pro: până la 300+ s). Dacă nu ajunge, soluția e o coadă (ex. Inngest/QStash) - notat pentru mai târziu.
 - **Preview-ul** se randează în browser (Konva, fonturi reale) de un component ascuns care procesează variantele fără preview și urcă PNG-ul + lista de texte care nu încap; QA-ul rulează la upload.
 - **QA vision** folosește Claude dacă e configurat, altfel mock-ul (care semnalează doar cuvinte before/after în nișa beauty).
+- **Editor:** mărimea textului setată manual oprește încadrarea automată pe layerul respectiv (checkbox „Încadrare automată”). Regenerarea imaginii din editor păstrează documentele editate și schimbă doar imaginea. Statusul variantei revine la „draft” după o imagine nouă.
+- **Export în browser**, cu un stage Konva ascuns la rezoluție completă (pixelRatio), un format pe rând; ZIP fără compresie (PNG-urile sunt deja comprimate).
