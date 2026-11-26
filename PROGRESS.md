@@ -11,8 +11,8 @@ _Ultima actualizare: 2026-11-26_
 | M2: Bibliotecă | ✅ gata |
 | M3: Generare cap-coadă (mock) | ✅ gata |
 | M4: Editor + export | ✅ gata |
-| M5: Feedback + brain | ⏳ în lucru (cod scris, de verificat) |
-| M6: Provideri reali + costuri | — |
+| M5: Feedback + brain | ✅ gata |
+| M6: Provideri reali + costuri | ⏳ urmează |
 | M7: QA + finisare | — |
 
 ## Ce e gata
@@ -55,6 +55,13 @@ _Ultima actualizare: 2026-11-26_
 - Export: PNG la rezoluție completă pe formatele bifate, ZIP `client_proiect_stil_format_v{index}.png` (verificat: 3 PNG-uri 1080×1350 / 1080×1920 / 1080×1080).
 - Derivarea 1:1 și cover respectă acum safe zone-ul (test pe toate stilurile × toate formatele).
 
+### M5
+- Feedback pe variantă (editor) → interpretare (Claude sau mock determinist: propozițiile cu „nu”, „evită”, „mereu”, „niciodată” devin reguli, restul one-off) → rezumat „Am înțeles…” + chip-uri de reguli cu Confirmă / Editează / Șterge.
+- Reguli `trial` cu sursă (feedback, variantă, autor, citat, dată); aceeași idee din nou → `confirmations++` (fără duplicat); promovare la Confirmă sau la 2 confirmări; maxim 15 în probă; arhivare automată după 30 de zile nefolosite; Șterge = arhivare, cu Restaurează.
+- „Fă-o regulă de agenție” (sugestie, nu automat), „Aplică la banner” pentru one-off (regenerează imaginea cu instrucțiunea, păstrând editările).
+- Tab Brain: Reguli fixe / în probă / Fapte-preferințe / Arhivate, editare inline, scope pe format, pin, istoric evenimente, link spre varianta-sursă, „Adaugă regulă”. Bibliotecă → Reguli agenție.
+- Verificat: feedback → regulă în probă → Confirmă → la generarea următoare apare în snapshot („De ce a făcut asta?”).
+
 ## Cum pornești
 
 ```
@@ -64,7 +71,7 @@ pnpm dev
 Apoi deschizi http://localhost:3000. Nu trebuie niciun `.env`.
 
 ## Ce urmează
-- M5: verificare feedback → reguli în browser, teste pentru promovare/arhivare.
+- M6: pagina Setări (status provideri, provider implicit, Test conexiune, costuri pe lună/client), teste cu HTTP mock-uit.
 
 ## Blocat
 - Nimic.

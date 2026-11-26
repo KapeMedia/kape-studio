@@ -29,3 +29,5 @@ Decizii luate autonom acolo unde SPEC.md nu spune explicit. Format: dată, deciz
 - **QA vision** folosește Claude dacă e configurat, altfel mock-ul (care semnalează doar cuvinte before/after în nișa beauty).
 - **Editor:** mărimea textului setată manual oprește încadrarea automată pe layerul respectiv (checkbox „Încadrare automată”). Regenerarea imaginii din editor păstrează documentele editate și schimbă doar imaginea. Statusul variantei revine la „draft” după o imagine nouă.
 - **Export în browser**, cu un stage Konva ascuns la rezoluție completă (pixelRatio), un format pe rând; ZIP fără compresie (PNG-urile sunt deja comprimate).
+- **„Aplică la banner” (one-off)** regenerează doar imaginea cu instrucțiunea adăugată la prompt (păstrând editările). Modificările de text one-off se fac în editor. *Schimbare:* se poate adăuga un apel Claude care rescrie copy-ul unei singure variante.
+- **Mock-ul de feedback** desparte comentariul în propoziții (și la „și nu…”), iar potrivirea cu o regulă existentă folosește similaritate Jaccard pe cuvinte (≥ 0,5).
