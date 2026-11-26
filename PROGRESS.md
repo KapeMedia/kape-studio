@@ -8,8 +8,8 @@ _Ultima actualizare: 2026-11-26_
 |---|---|
 | M0: Fundația | ✅ gata |
 | M1: Clienți, brand kit, proiecte | ✅ gata |
-| M2: Bibliotecă | ⏳ urmează |
-| M3: Generare cap-coadă (mock) | — |
+| M2: Bibliotecă | ✅ gata |
+| M3: Generare cap-coadă (mock) | ⏳ urmează |
 | M4: Editor + export | — |
 | M5: Feedback + brain | — |
 | M6: Provideri reali + costuri | — |
@@ -31,6 +31,13 @@ _Ultima actualizare: 2026-11-26_
 - Proiecte (creare, arhivare/restaurare) și referințe de inspirație pe proiect.
 - Verificat în browser: client nou → logo, 2 culori, font, 3 poze → proiect.
 
+### M2
+- Bibliotecă: Stiluri (preview feed + story cu brandul clientului ales), editare stil cu versiuni noi la salvare și „Publică versiunea”, imagini de referință pe stil, arhivare.
+- Template-uri: editor JSON validat cu Zod + preview live Konva pe orice format (cu safe zone), duplicare, template nou.
+- Formate editabile (dimensiuni, safe zone, avoidRects, note, activ).
+- Funcții pure testate: `fitText` (încadrare text), `getLayout` (derivare 1:1 / story / landscape / cover), `resolveDocument`.
+- Renderer Konva (`src/editor/document-canvas.tsx`) cu fonturi încărcate prin FontFace, refit cu fontul real, overlay safe zone, suport de editare (selecție, drag, resize).
+
 ## Cum pornești
 
 ```
@@ -40,7 +47,7 @@ pnpm dev
 Apoi deschizi http://localhost:3000. Nu trebuie niciun `.env`.
 
 ## Ce urmează
-- M2: Bibliotecă (formate, template-uri cu editor JSON + preview Konva, stiluri versionate), resolveDocument, derivarea formatelor, încadrarea textului.
+- M3: generare cap-coadă cu provideri mock (brief, unghiuri, buildContext, copy + vizual, imagini, compoziție, grid de review, „De ce a făcut asta?”).
 
 ## Blocat
 - Nimic.
