@@ -29,6 +29,7 @@ export type GenerationView = {
   status: string;
   error: string | null;
   authorName: string | null;
+  clientId: string;
   projectId: string;
   projectName: string | null;
   brief: { message: string; formats: string[]; variantCount: number; styleId: string | null };
@@ -74,6 +75,7 @@ export async function listGenerations(
       status: g.status,
       error: g.error,
       authorName: author,
+      clientId: g.clientId,
       projectId: g.projectId,
       projectName,
       brief: { message: g.brief.message, formats: g.brief.formats, variantCount: g.brief.variantCount, styleId: g.brief.styleId },

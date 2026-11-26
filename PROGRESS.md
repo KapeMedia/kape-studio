@@ -1,6 +1,6 @@
 # PROGRESS.md
 
-_Ultima actualizare: 2026-11-26_
+_Ultima actualizare: 2026-11-26 (M0–M7 gata)_
 
 ## Stare milestone-uri
 
@@ -13,7 +13,7 @@ _Ultima actualizare: 2026-11-26_
 | M4: Editor + export | ✅ gata |
 | M5: Feedback + brain | ✅ gata |
 | M6: Provideri reali + costuri | ✅ gata (testat cu HTTP mock-uit; netestat cu chei reale) |
-| M7: QA + finisare | ⏳ urmează |
+| M7: QA + finisare | ✅ gata |
 
 ## Ce e gata
 
@@ -69,6 +69,14 @@ _Ultima actualizare: 2026-11-26_
 - Setări: status pe provider (activ / mock / eroare la ultimul apel), provider implicit de imagine, „Test conexiune”, utilizatori, clienți arhivați.
 - Teste cu `fetch` mock-uit pentru toți trei providerii (fără apeluri reale).
 
+### M7
+- QA complet: `safe_zone` (inclusiv zone acoperite, ex. poza de profil pe cover), `text_overflow`, `min_font`, `contrast` (eșantionat din preview), `logo_present`, `diacritics` (corectare automată ş/ţ → ș/ț); QA vision cu Claude când există cheie, mock altfel. Badge-uri ok / avertisment / eroare pe carduri și panou QA în editor.
+- Verificat în UI: headline mutat în afara safe zone-ului pe story → badge „1 eroare”.
+- Istoric client (toate generările, filtre după status și proiect, cost), Dashboard (clienți cu cost și generări pe lună, ultimele generări, cost luna curentă).
+- README: setup local, variabile de mediu, deploy Vercel + Postgres (Supabase/Neon) + Supabase Storage, migrații în producție.
+
+**Total teste: 63 (10 fișiere), toate verzi. typecheck, lint, build: verzi.**
+
 ## Cum pornești
 
 ```
@@ -78,7 +86,8 @@ pnpm dev
 Apoi deschizi http://localhost:3000. Nu trebuie niciun `.env`.
 
 ## Ce urmează
-- M7: Istoric client cu filtre, Dashboard (ultimele generări, cost luna asta), README cu deploy.
+- Toate milestone-urile M0–M7 sunt gata. Următorul pas e „Polish” (SPEC §12): stări goale, skeleton loaders, scurtături în editor, editor vizual de template, duplicare proiect, căutare globală (Cmd+K).
+- Prima generare cu chei reale (Claude + OpenAI/Gemini) trebuie urmărită: integrarea e testată doar cu răspunsuri HTTP simulate.
 
 ## Blocat
 - Nimic.
@@ -89,4 +98,8 @@ Apoi deschizi http://localhost:3000. Nu trebuie niciun `.env`.
 - (opțional) Repo-ul GitHub e **public**. Dacă vrei să fie privat: GitHub → Settings → Danger zone → Change visibility.
 
 ## Idei pentru mai târziu
-- (gol)
+- Coadă de joburi (Inngest / QStash) pentru generări lungi pe Vercel Hobby (limita de 60 s).
+- „Aplică la banner” care rescrie și textul unei singure variante cu Claude (acum regenerează doar imaginea).
+- Driver de storage Vercel Blob (acum doar local și Supabase).
+- Retry automat al preview-urilor care nu s-au putut urca.
+- Aprobarea să se reseteze automat când varianta e editată după aprobare.

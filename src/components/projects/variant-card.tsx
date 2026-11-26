@@ -19,6 +19,13 @@ export const STATUS_LABEL: Record<string, { label: string; tone: "gray" | "green
   delivered: { label: "livrat", tone: "accent" },
 };
 
+function qaLabel(qa: QaResult) {
+  const errors = qa.issues.filter((i) => i.severity === "error").length;
+  const warnings = qa.issues.length - errors;
+  if (errors) return errors === 1 ? "1 eroare" : `${errors} erori`;
+  return warnings === 1 ? "1 avertisment" : `${warnings} avertismente`;
+}
+
 export function QaBadge({ qa }: { qa: QaResult | null }) {
   if (!qa) return <Badge>QA…</Badge>;
   const icon = qa.status === "ok" ? <CircleCheck className="h-3 w-3" /> : qa.status === "warning" ? <AlertTriangle className="h-3 w-3" /> : <CircleAlert className="h-3 w-3" />;
@@ -39,7 +46,7 @@ export function QaBadge({ qa }: { qa: QaResult | null }) {
     >
       <span>
         <Badge tone={tone}>
-          {icon} {qa.status === "ok" ? "QA ok" : `${qa.issues.length} ${qa.status === "error" ? "erori" : "avertismente"}`}
+          {icon} {qa.status === "ok" ? "QA ok" : qaLabel(qa)}
         </Badge>
       </span>
     </Tooltip>
