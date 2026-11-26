@@ -51,17 +51,27 @@ export class AnthropicProvider implements LLMProvider {
     let lastError = "";
     for (let attempt = 0; attempt < 2; attempt++) {
       const extra: UserContent = attempt === 0 ? [] : [{ type: "text", text: `Răspunsul anterior nu a fost valid (${lastError}). Respectă exact schema JSON.` }];
-      const res = await withRetry(() =>
-        this.api.beta.messages.parse({
-          model: this.model,
-          max_tokens: maxTokens,
-          system: SYSTEM_PROMPT,
-          betas: ["server-side-fallback-2026-07-01"],
-          fallbacks: "default",
-          output_config: { format: betaZodOutputFormat(schema), effort: "medium" },
-          messages: [{ role: "user", content: [...content, ...extra] }],
-        }),
-      );
+      let res;
+      try {
+        res = await withRetry(() =>
+          this.api.beta.messages.parse({
+            model: this.model,
+            max_tokens: maxTokens,
+            system: SYSTEM_PROMPT,
+            betas: ["server-side-fallback-2026-07-01"],
+            fallbacks: "default",
+            output_config: { format: betaZodOutputFormat(schema), effort: "medium" },
+            messages: [{ role: "user", content: [...content, ...extra] }],
+          }),
+        );
+      } catch (e) {
+        // The SDK throws when the returned JSON does not match the schema → one more attempt.
+        if (e instanceof Error && /Failed to parse structured output/.test(e.message)) {
+          lastError = e.message.slice(0, 200);
+          continue;
+        }
+        throw new Error(humanizeError(e, "Anthropic"));
+      }
       inputTokens += res.usage.input_tokens;
       outputTokens += res.usage.output_tokens;
       if (res.stop_reason === "refusal") throw new Error("Claude a refuzat cererea (filtru de siguranță). Reformulează brief-ul.");

@@ -12,8 +12,8 @@ _Ultima actualizare: 2026-11-26_
 | M3: Generare cap-coadă (mock) | ✅ gata |
 | M4: Editor + export | ✅ gata |
 | M5: Feedback + brain | ✅ gata |
-| M6: Provideri reali + costuri | ⏳ urmează |
-| M7: QA + finisare | — |
+| M6: Provideri reali + costuri | ✅ gata (testat cu HTTP mock-uit; netestat cu chei reale) |
+| M7: QA + finisare | ⏳ urmează |
 
 ## Ce e gata
 
@@ -62,6 +62,13 @@ _Ultima actualizare: 2026-11-26_
 - Tab Brain: Reguli fixe / în probă / Fapte-preferințe / Arhivate, editare inline, scope pe format, pin, istoric evenimente, link spre varianta-sursă, „Adaugă regulă”. Bibliotecă → Reguli agenție.
 - Verificat: feedback → regulă în probă → Confirmă → la generarea următoare apare în snapshot („De ce a făcut asta?”).
 
+### M6
+- Provideri reali: Anthropic (`@anthropic-ai/sdk`, output structurat validat cu Zod + retry), OpenAI `gpt-image-2` (generate; edits când există imagini de referință), Gemini `gemini-3-pro-image-preview` (`@google/genai`, aspect ratio mapat, referințe ca `inlineData`). Retry cu backoff la 429/5xx, timeout, mesaje de eroare în română.
+- Tabel de prețuri editabil (`src/server/services/costs/prices.ts`): gpt-image-2  /  / 0 per 1M; Claude Sonnet 5.5  / 0; Gemini = 0 cu TODO vizibil în Setări.
+- Cost pe fiecare `llm_calls`, însumat pe generare (afișat în grid) și în Setări (total pe lună, pe client, pe provider).
+- Setări: status pe provider (activ / mock / eroare la ultimul apel), provider implicit de imagine, „Test conexiune”, utilizatori, clienți arhivați.
+- Teste cu `fetch` mock-uit pentru toți trei providerii (fără apeluri reale).
+
 ## Cum pornești
 
 ```
@@ -71,12 +78,14 @@ pnpm dev
 Apoi deschizi http://localhost:3000. Nu trebuie niciun `.env`.
 
 ## Ce urmează
-- M6: pagina Setări (status provideri, provider implicit, Test conexiune, costuri pe lună/client), teste cu HTTP mock-uit.
+- M7: Istoric client cu filtre, Dashboard (ultimele generări, cost luna asta), README cu deploy.
 
 ## Blocat
 - Nimic.
 
 ## Ce trebuie să facă Onisim
+- Ca să folosești AI real, pune cheile în `.env.local` (vezi `.env.example`): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` și/sau `GEMINI_API_KEY`. Apoi în Setări apasă „Test conexiune” la fiecare. Integrarea reală a fost testată doar cu răspunsuri simulate: prima generare cu chei reale merită urmărită.
+- Verifică prețul Gemini și completează-l în `src/server/services/costs/prices.ts` (acum e 0, marcat TODO).
 - (opțional) Repo-ul GitHub e **public**. Dacă vrei să fie privat: GitHub → Settings → Danger zone → Change visibility.
 
 ## Idei pentru mai târziu
